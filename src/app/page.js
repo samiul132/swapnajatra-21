@@ -1,65 +1,219 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+
+const SECTIONS = [
+  {
+    id: 1, color: "#e63946",
+    title: "ধারা ১: নাম, বৈশিষ্ট্য, লোগো ও কার্যালয়",
+    items: [
+      { sub: "ক) নাম",       body: 'এই সংগঠনের নাম হবে বাংলায় "স্বপ্নযাত্রা-২১"।' },
+      { sub: "খ) বৈশিষ্ট্য", body: "১) একটি অরাজনৈতিক, অলাভজনক এবং কল্যাণ ও সেবামূলক সংগঠন হিসেবে পরিচালিত হবে।\n২) সংগঠনের একটি সীলমোহর ও লোগো থাকবে।\n৩) দাপ্তরিক ভাষা হবে বাংলা ও ইংরেজি।" },
+      { sub: "গ) লোগো",      body: "সংগঠনের নিজস্ব লোগো থাকবে।" },
+      { sub: "ঘ) কার্যালয়", body: "সংগঠনের প্রাথমিক সফলতার উপর নির্ভর করে কার্যালয়ের ঠিকানা নির্ধারণ করা হবে।" },
+    ],
+  },
+  {
+    id: 2, color: "#457b9d",
+    title: "ধারা ২: সংজ্ঞা ও ব্যাখ্যা",
+    items: [
+      { sub: "ক) সংগঠন",              body: '"নিশ্চিন্তপুর উচ্চ বিদ্যালয়ের ২০২১ সালের এসএসসি পরীক্ষার্থী শিক্ষার্থীদের একত্রে বুঝাবে"।' },
+      { sub: "খ) গঠনতন্ত্র",          body: "সাধারণ পরিষদ কর্তৃক অনুমোদিত এবং সময়ে সময়ে সংশোধিত সংগঠনের গঠনতন্ত্রকে বুঝাবে।" },
+      { sub: "গ) ধারা ও বিধি",        body: "গঠনতন্ত্রের ধারা এবং অধীনে প্রণীত বিধি ও উপ বিধিসমূহকে বুঝাবে।" },
+      { sub: "ঘ) উপদেষ্টা পরিষদ",    body: "ধারা-৭ কে বুঝাবে।" },
+      { sub: "ঙ) কার্যনির্বাহী পরিষদ", body: "সংগঠনের সদস্যদের মধ্যে হতে মনোনীত নির্বাচিত প্রয়োজনীয় সংখ্যক সদস্য নিয়ে গঠিত পরিষদকে বুঝাবে।" },
+    ],
+  },
+  {
+    id: 3, color: "#2d6a4f",
+    title: "ধারা ৩: লক্ষ্য ও উদ্দেশ্য",
+    items: [
+      { sub: "", body: "১) স্কুলের শিক্ষার্থীদের সমস্যাগুলির দ্রুত সমাধানের জন্য একটি কার্যকর যোগাযোগ প্ল্যাটফর্ম তৈরি।\n২) সামাজিক কল্যাণমূলক কাজে অংশগ্রহণ করা।\n৩) সংগঠনের সদস্যদের আর্থসামাজিক উন্নয়নে সাহায্য করা।\n৪) নিশ্চিন্তপুর উচ্চ বিদ্যালয়ের ২০২১ সালের এসএসসি সকল শিক্ষার্থীদের একত্রিত করা ও নেটওয়াকিং তৈরি করা।" },
+    ],
+  },
+  {
+    id: 4, color: "#7b2d8b",
+    title: "ধারা ৪: সাধারণ সদস্য",
+    items: [
+      { sub: "", body: "সাধারণ সদস্য কেবলমাত্র ২ (ক) ধারাতে সংজ্ঞায়িত নিশ্চিন্তপুর উচ্চ বিদ্যালয়ের ২০২১ সালের এসএসসি পরীক্ষার্থী শিক্ষার্থীদের জন্য নির্ধারিত থাকবে। যে কোন শিক্ষার্থী নামমাত্র রেজিস্ট্রেশন ফি বা সর্বনিম্ন ১০০ টাকা প্রদানপূর্বক সাধারণ সদস্য হতে পারিবেন।" },
+      { sub: "ধারা ৪.১: সাধারণ সদস্যদের অধিকার ও সুবিধা", body: "ক. বিধি মোতাবেক কার্যনির্বাহী কমিটির কর্মকাণ্ডের ব্যাখ্যা দাবি করা এবং আয়-ব্যয়ের হিসাব চাওয়া।\nখ. সংগঠনের যে কোন কমিটিতে নির্বাচনে অংশগ্রহণ করা।\nগ. ভোট প্রদান করা।\nঘ. সংগঠনের উন্নয়নের স্বার্থে পরামর্শদান বা নির্বাচন কমিশনে কাজ করা।\nঙ. কার্য নির্বাহী পরিষদ যদি তাদের দায়িত্ব যথাযথ পালন না করে তাহলে তাদের পদত্যাগের দাবি করতে পারবে।" },
+    ],
+  },
+  {
+    id: 5, color: "#c77dff",
+    title: "ধারা ৫: চাঁদা সম্পর্কিত",
+    items: [
+      { sub: "", body: "১. সংগঠনে প্রদত্ত টাকা ব্যক্তিস্বার্থে ব্যবহার করা যাবে না এবং সংঠনে প্রদত্ত টাকা পরবর্তীতে কেউ উত্তোলন বা নিজের দাবি করতে পারবে না।\n২. মাসিক চাঁদা প্রতি মাসের ১-১০ তারিখের মধ্যে পরিশোধ করা লাগবে।\n৩. বার্ষিক চাঁদা ক্যাশিয়ারের সাথে আলোচনা করে নির্দিষ্ট সময়ের মধ্যে পরিশোধ করা লাগবে।" },
+    ],
+  },
+  {
+    id: 6, color: "#f4a261",
+    title: "ধারা ৬: সাংগঠনিক কাঠামো",
+    items: [
+      { sub: "", body: "সংগঠনের সাংগঠনিক কাঠামো হবে নিম্নরূপ:\nক) উপদেষ্টা পরিষদ\nখ) কার্যনির্বাহী পরিষদ" },
+    ],
+  },
+  {
+    id: 7, color: "#e76f51",
+    title: "ধারা ৭: উপদেষ্টা পরিষদ",
+    items: [
+      { sub: "", body: "ক) নিশ্চিন্তপুর উচ্চ বিদ্যালয়ের ৩ জন শিক্ষক উপদেষ্টা পরিষদের সদস্য মনোনীত হবেন।\nখ) পদাধিকার বলে সভাপতি, সহ-সভাপতি উপদেষ্টা পরিষদে যুক্ত হবেন।" },
+      { sub: "ধারা ৭.১: উপদেষ্টা পরিষদ দায়িত্ব", body: "ক) বছরে অন্তত দুইবার উপদেষ্টা পরিষদ এবং কার্যনিবাহী পরিষদের মধ্যে যৌথসভা অনুষ্ঠিত হবে।\nখ) কার্যনির্বাহী পরিষদকে উপদেষ্টা পরিষদ যে কোন সমস্যা সমাধানে সর্বোচ্চ সাহায্য প্রদান করবেন।\nগ) নির্বাচন কমিশনের দায়িত্বে উপদেষ্টা পরিষদ থাকবেন।" },
+    ],
+  },
+  {
+    id: 8, color: "#2196f3",
+    title: "ধারা ৮: কার্যনির্বাহী পরিষদ",
+    items: [
+      { sub: "", body: "ক) সংগঠনের সদস্যদের কর্তৃক মনোনিত শিক্ষার্থীদের নিয়ে সম্মিলিত কার্যনির্বাহী পরিষদ গঠিত হবে।\nখ) কার্যনিবাহী পরিষদ বছরে কমপক্ষে ৩টি সভা করবে প্রয়োজন সাপেক্ষে সভা আরো বেশিও পরিচালনা করতে পারে।\nগ) কার্যনিবাহী পরিষদের কমপক্ষে এক তৃতীয়াংশ সদস্যের উপস্থিতি থাকলেই সভা পরিচালিত হবে।\nঘ) কার্যনির্বাহী পরিষদের সকল সিদ্ধান্ত উপস্থিত সংখ্যাগরিষ্ঠ সদস্যদের ভোট বা সমর্থনে গৃহীত হবে।\nঙ) প্রতি বছর কার্যনিবাহী পরিষদের সদস্য নির্বাচন অনুষ্ঠিত হবে। কোনো ব্যক্তি তিনবারের বেশি সভাপতিত্ব বা সহ সভাপতিত্ব করতে পারবে না।\nচ) যেহেতু সভাপতি এবং সহ-সভাপতি তিনবারের বেশি নির্বাচন করতে পারবে না তাই তারা সফলতার সাথে দায়িত্ব পালন শেষ করে পদাধিকার বলে উপদেষ্টা পরিষদে যুক্ত হবে।" },
+    ],
+  },
+  {
+    id: 9, color: "#43aa8b",
+    title: "ধারা ৯: কার্যনির্বাহী পরিষদের নির্বাচন",
+    items: [
+      { sub: "", body: "১। প্রতি এক বছর পর পর কার্যনির্বাহী পরিষদের নির্বাচন অনুষ্ঠিত হবে এবং যে কোন পদের প্রার্থী হতে হইলে তাকে অবশ্যই ভোটার হতে হবে।\n২। নির্বাচন কমিশন কার্যনির্বাহী কমিটির সহযোগিতায় ভোটার তালিকা প্রণয়ন করে সকলের অবগতির জন্য প্রকাশ করবেন।\n৩। নির্বাচন কমিশনের দায়িত্বে উপদেষ্টা পরিষদ থাকবেন। সহযোগিতার জন্য কার্য নির্বাহী পরিষদের বাহিরে সাধারণ সদস্যরা থাকবেন।\n৪। নির্বাচন সংক্রান্ত বিষয়ে নির্বাচন কমিশনের রায়ই চূড়ান্ত বলে গণ্য হবে।\n৫। কার্য নির্বাহী পরিষদের মেয়াদ উত্তীর্ণ হওয়ার কমপক্ষে ১৫ দিন পূর্বে নির্বাচন সম্পন্ন করে ফলাফল ঘোষনা করতে হবে।" },
+    ],
+  },
+  {
+    id: 10, color: "#e63946",
+    title: "ধারা ১০: অনাস্থা প্রস্তাব",
+    items: [
+      { sub: "ক. অনাস্থা প্রস্তাব আনার প্রক্রিয়া",  body: "কার্যনির্বাহী কমিটির বিরুদ্ধে অনাস্থা প্রস্তাব আনার জন্য কমপক্ষে দুই-তৃতীয় সাধারণ সদস্যকে লিখিতভাবে প্রস্তাব দিতে হবে। এই লিখিত প্রস্তাব সভাপতি এবং উপদেষ্টাদের নিকট প্রদান করতে হবে।" },
+      { sub: "খ. অনাস্থা প্রস্তাব পাসের শর্ত",         body: "সাধারণ সভায় মোট সদস্য সংখ্যার তিন-চতুর্থাংশ সদস্য উপস্থিত থাকতে হবে। উপস্থিত সদস্যদের দুই-তৃতীয়াংশ ভোটে অনাস্থা প্রস্তাব পাস হবে।" },
+      { sub: "গ. পরবর্তী ব্যবস্থা",                     body: "অনাস্থা প্রস্তাব পাস হলে, পরবর্তী ৩০ (ত্রিশ) দিনের মধ্যে নতুন কার্যনির্বাহী কমিটির নির্বাচন অথবা শূন্যপদ পূরণের ব্যবস্থা গ্রহণ করতে হবে।" },
+    ],
+  },
+  {
+    id: 11, color: "#6d6875",
+    title: "ধারা ১১: সদস্য পদ বাতিল/স্থগিতের নিয়মাবলী",
+    items: [
+      { sub: "", body: "ক) যদি কোন সদস্য স্বেচ্ছায় সঠিক ও উপযুক্ত কারণ দর্শানোপূর্বক লিখিত আকারে পদত্যাগ করেন।\nখ) যদি সংগঠনের গঠনতন্ত্র ও স্বার্থের পরিপন্থী কোন কাজ করেন বা তার স্বভাব আচার আচরণ সংস্থার পরিপন্থী হয়।\nগ) মৃত্যু বা মস্তিষ্ক বিকৃত ঘটলে।\nঘ) যদি কার্য নির্বাহী পরিষদের কেউ দায়িত্ব যথাযথ পালন না করলে তাহলে তাকে কার্য নির্বাহী পরিষদ থেকে বাদ দেওয়া হবে।\nঙ) সংগঠনের কোন সদস্য যদি শিক্ষা প্রতিষ্ঠান ও রাষ্ট্র বিরোধী কার্যকলাপে লিপ্ত হলে।\nচ) কার্য নির্বাহী পরিষদের কেউ যদি টানা তিন বার সভায় উপস্থিত না থাকে তাহলে তাকে কার্য নির্বাহী পরিষদ থেকে বাদ দেওয়া হবে।\nছ) আদালত কর্তৃক সাজাপ্রাপ্ত হলে।" },
+    ],
+  },
+  {
+    id: 12, color: "#3a86ff",
+    title: "ধারা ১২: সংগঠনের গ্রুপ এবং ফেসবুক পেজ সম্পর্কিত",
+    items: [
+      { sub: "", body: "১. সংগঠনের গ্রুপে কোন ধরনের দুষ্টামি বা মজা করা যাবে না।\n২. যেকোন ধরনের মতামত প্রদান করা যাবে সংগঠন সম্পর্কিত।\n৩. গ্রুপে কোন ধরনের অশালীন ভাষা ব্যবহার করা যাবে না।" },
+    ],
+  },
+  {
+    id: 13, color: "#ff6b6b",
+    title: "ধারা ১৩: গঠনতন্ত্র পরিবর্তন, সংযোজন ও বিয়োজন",
+    items: [
+      { sub: "", body: "সময়ের প্রয়োজনে যদি গঠনতন্ত্র পরিবর্তন, সংযোজন ও বিয়োজন এর প্রয়োজন হয়, তবে কার্যনির্বাহী পরিষদের মতামতের ভিত্তিতে তা করা যাবে। প্রয়োজনে সাধারণ সদস্যদের মতামত নেওয়া যেতে পারে এবং সংশোধন কমিটি গঠন করা যেতে পারে।" },
+    ],
+  },
+];
 
 export default function Home() {
+  const [active, setActive] = useState(null);
+  const toggle = (id) => setActive((p) => (p === id ? null : id));
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <>
+      {/* Hero */}
+      <section className="hero">
+        <div className="hero-glow" />
+        <div className="container">
+
+          <div className="hero-badge">
+            <span className="hero-badge-dot" />
+            নিশ্চিন্তপুর উচ্চ বিদ্যালয় · SSC 2021
+          </div>
+
+          <h1 className="hero-title">স্বপ্নযাত্রা-২১</h1>
+
+          <p className="hero-sub">
+            একটি অরাজনৈতিক, অলাভজনক এবং কল্যাণমূলক সংগঠন।
+            আমাদের লক্ষ্য সকল সদস্যের একতা ও সামাজিক উন্নয়ন।
           </p>
+
+          <div className="hero-actions">
+            <Link href="/gothontontro" className="btn-primary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+              গঠনতন্ত্র দেখুন
+            </Link>
+            <Link href="/members" className="btn-secondary">
+              সদস্যবৃন্দ →
+            </Link>
+          </div>
+
+          <div className="stats-row">
+            {[
+              { num: "১৩",   label: "ধারা" },
+              { num: "২০২১", label: "সালের ব্যাচ" },
+              { num: "২",    label: "পরিষদ" },
+              { num: "১০০৳", label: "সদস্যপদ ফি" },
+            ].map((s) => (
+              <div key={s.label} className="stat-item">
+                <div className="stat-num">{s.num}</div>
+                <div className="stat-label">{s.label}</div>
+              </div>
+            ))}
+          </div>
+
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* Accordion */}
+      <section className="section-wrap">
+        <div className="container">
+
+          <div className="section-head">
+            <span className="section-line" />
+            <span className="section-title">গঠনতন্ত্রের ধারাসমূহ</span>
+            <span className="section-line" />
+          </div>
+
+          {SECTIONS.map((sec) => {
+            const isOpen = active === sec.id;
+            return (
+              <div
+                key={sec.id}
+                className={`card${isOpen ? " active" : ""}`}
+                onClick={() => toggle(sec.id)}
+              >
+                <div className="card-header">
+                  <div className="card-num"
+                    style={{ background: `${sec.color}22`, color: sec.color }}>
+                    {sec.id}
+                  </div>
+                  <div className="card-title">{sec.title}</div>
+                  <div className="color-dot" style={{ background: sec.color }} />
+                  <svg className={`chevron${isOpen ? " open" : ""}`}
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </div>
+
+                <div className={`card-body${isOpen ? " open" : ""}`}>
+                  <div className="card-inner">
+                    {sec.items.map((item, i) => (
+                      <div key={i} className="item">
+                        {item.sub && (
+                          <div className="item-subtitle" style={{ color: sec.color }}>
+                            {item.sub}
+                          </div>
+                        )}
+                        <p className="item-content">{item.body}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+
         </div>
-      </main>
-    </div>
+      </section>
+    </>
   );
 }
