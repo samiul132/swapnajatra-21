@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { href: "/",             label: "হোম" },
   { href: "/gothontontro", label: "গঠনতন্ত্র" },
   { href: "/members",      label: "সদস্যবৃন্দ" },
+  { href: "/custom-pad", label: "প্যাড ✍️" },
   { href: "/contact",      label: "যোগাযোগ" },
 ];
 

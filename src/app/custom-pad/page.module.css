@@ -1,0 +1,306 @@
+/* ── Wrapper ─────────────────────────────────────────────── */
+.wrapper {
+  min-height: calc(100vh - var(--nav-h));
+  background: var(--bg);
+  padding: 1.5rem 1rem 5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────── */
+.toolbar {
+  width: 100%;
+  max-width: 870px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.55rem 0.9rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  box-shadow: 0 4px 28px rgba(0,0,0,0.35);
+  position: sticky;
+  top: calc(var(--nav-h) + 0.75rem);
+  z-index: 100;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.sep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; margin: 0 0.1rem; }
+.spacer { flex: 1; min-width: 4px; }
+
+/* Selects */
+.select {
+  height: 30px; padding: 0 0.45rem; border-radius: 7px;
+  background: var(--surface2); color: var(--text-body);
+  border: 1px solid var(--border); font-size: 0.77rem;
+  font-family: var(--font-body); outline: none; cursor: pointer;
+  transition: border-color 0.15s, color 0.15s; max-width: 160px;
+}
+.selectSm { composes: select; max-width: 56px; }
+.select:hover, .selectSm:hover { border-color: var(--accent); color: var(--text); }
+
+/* Toolbar buttons */
+.toolBtn {
+  width: 30px; height: 30px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid transparent;
+  color: var(--text-body); cursor: pointer;
+  transition: background 0.14s, color 0.14s, border-color 0.14s;
+  flex-shrink: 0; padding: 0;
+}
+.toolBtn:hover { background: rgba(108,99,255,0.1); color: var(--accent); border-color: rgba(108,99,255,0.22); }
+.toolBtnActive { background: rgba(108,99,255,0.16) !important; color: var(--accent) !important; border-color: rgba(108,99,255,0.35) !important; }
+
+.actionLabel {
+  display: flex; align-items: center; gap: 5px;
+  font-family: var(--font-body); font-size: 0.76rem;
+  font-weight: 600; white-space: nowrap;
+  width: max-content; min-width: 70px;
+}
+
+/* Color pickers */
+.colorWrap {
+  position: relative; width: 30px; height: 30px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border: 1px solid var(--border);
+  background: var(--surface2); transition: border-color 0.15s;
+  overflow: hidden; flex-shrink: 0;
+}
+.colorWrap:hover { border-color: var(--accent); }
+.colorIcon {
+  font-size: 0.92rem; font-weight: 900; color: var(--text);
+  text-decoration: underline; text-decoration-color: #e63946;
+  text-decoration-thickness: 3px; text-underline-offset: 1px;
+  pointer-events: none; position: relative; z-index: 1;
+}
+.hlIcon { color: var(--text-body); pointer-events: none; position: relative; z-index: 1; display: flex; align-items: center; }
+.colorInput { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; border: none; padding: 0; }
+
+/* Action buttons */
+.saveActionBtn {
+  height: 30px; padding: 0 0.7rem; border-radius: 7px;
+  background: rgba(67,170,139,0.1); color: var(--success);
+  border: 1px solid rgba(67,170,139,0.25); cursor: pointer;
+  transition: background 0.15s; display: flex; align-items: center;
+}
+.saveActionBtn:hover { background: rgba(67,170,139,0.2); border-color: rgba(67,170,139,0.45); }
+
+.printActionBtn {
+  height: 30px; padding: 0 0.85rem; border-radius: 7px;
+  background: linear-gradient(135deg, var(--accent), #8b5cf6);
+  color: #fff; border: none; cursor: pointer; font-weight: 700;
+  transition: opacity 0.15s, transform 0.15s; display: flex; align-items: center;
+}
+.printActionBtn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.hidden { display: none; }
+
+/* ── Pad outer ──────────────────────────────────────────────
+   Width = 100% (up to 870px), height set inline by JS (A4_H * scale).
+   This provides the correct scroll/layout height while the inner
+   canvas is scaled via transform.
+────────────────────────────────────────────────────────────── */
+.padOuter {
+  width: 100%;
+  max-width: 870px;
+  position: relative;
+  /* height is set inline by JS */
+}
+
+/* ── Pad Sheet — fixed 794×1123 canvas ─────────────────────
+   Positioned at top-left of padOuter, scaled from top-left.
+   Because transform doesn't affect layout flow, padOuter height
+   is set explicitly in JS to A4_H * scale.
+────────────────────────────────────────────────────────────── */
+.padSheet {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* width + height set inline by JS */
+  background: #ffffff;
+  box-shadow:
+    0 2px 6px rgba(0,0,0,0.1),
+    0 12px 40px rgba(0,0,0,0.28),
+    0 30px 80px rgba(0,0,0,0.15);
+  /* transform + transformOrigin set inline by JS */
+  overflow: hidden; /* clip images that go outside */
+}
+
+/* Pad background image */
+.padBg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/pad.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: 0;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ── Text editor zone ───────────────────────────────────────
+   Positioned in absolute px matching PAD_TOP / PAD_LEFT etc.
+   (these match the constants in page.js)
+────────────────────────────────────────────────────────────── */
+.editorWrap {
+  position: absolute;
+  /* 19% of 1123 ≈ 213px  |  12.5% footer → bottom at 87.5% of 1123 ≈ 983px */
+  top: 213px;
+  bottom: 140px;   /* 1123 - 983 = 140 */
+  left: 40px;      /* 5% of 794 */
+  right: 32px;     /* 4% of 794 */
+  z-index: 10;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.editorWrap::-webkit-scrollbar { width: 4px; }
+.editorWrap::-webkit-scrollbar-thumb { background: rgba(26,86,219,0.25); border-radius: 2px; }
+
+/* ── TipTap editor ─────────────────────────────────────────── */
+.tiptap {
+  outline: none;
+  min-height: 100%;
+  font-family: 'Noto Serif Bengali', serif;
+  font-size: 14px;        /* fixed px — scale handles responsive sizing */
+  line-height: 1.9;
+  color: #1a1a2e;
+  caret-color: #1a56db;
+  padding: 4px 6px;
+  word-break: break-word;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  content: "এখানে লিখুন...";
+  color: rgba(26,26,46,0.28);
+  float: left; height: 0;
+  pointer-events: none; font-style: italic;
+}
+.tiptap h1 { font-size: 26px; font-weight: 900; line-height: 1.2; margin: 0.4em 0 0.2em; color: #0d1b6e; }
+.tiptap h2 { font-size: 20px; font-weight: 700; line-height: 1.3; margin: 0.4em 0 0.2em; color: #1a2e7a; }
+.tiptap h3 { font-size: 16px; font-weight: 600; margin: 0.3em 0 0.15em; }
+.tiptap p  { margin: 0 0 0.25em; }
+.tiptap ul, .tiptap ol { padding-left: 1.4em; margin: 0.2em 0; }
+.tiptap li { margin-bottom: 0.1em; }
+.tiptap blockquote { border-left: 3px solid #1a56db; padding-left: 0.75em; margin: 0.4em 0; color: #3a4a8a; font-style: italic; }
+.tiptap a  { color: #1a56db; text-decoration: underline; }
+
+/* ── Floating images ─────────────────────────────────────── */
+.floatImg {
+  position: absolute;
+  border-radius: 4px;
+  user-select: none;
+  /* left, top, width, z-index, outline, cursor set inline */
+}
+.floatImg:active { cursor: grabbing !important; }
+
+.floatImgLabel {
+  position: absolute;
+  bottom: -20px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10,10,30,0.82);
+  color: rgba(200,220,255,0.8);
+  font-size: 10px; padding: 2px 8px;
+  border-radius: 4px; white-space: nowrap;
+  pointer-events: none; letter-spacing: 0.02em;
+}
+
+.floatImgDelete {
+  position: absolute; top: -10px; right: -10px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #e63946; color: #fff;
+  border: 2px solid #fff; font-size: 9px;
+  cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  z-index: 40; padding: 0; line-height: 1;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  transition: background 0.15s, transform 0.15s;
+}
+.floatImgDelete:hover { background: #c1121f; transform: scale(1.15); }
+
+.floatImgResize {
+  position: absolute; bottom: -6px; right: -6px;
+  width: 14px; height: 14px;
+  background: #1a56db; border: 2px solid #fff;
+  border-radius: 3px; cursor: se-resize; z-index: 40;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.35);
+  transition: background 0.15s, transform 0.15s;
+}
+.floatImgResize:hover { background: #6c63ff; transform: scale(1.25); }
+
+/* ── Hint bar ───────────────────────────────────────────── */
+.hint {
+  width: 100%; max-width: 870px;
+  background: rgba(26,86,219,0.08);
+  border: 1px solid rgba(26,86,219,0.18);
+  border-radius: 8px; padding: 0.45rem 1rem;
+  font-size: 0.76rem; color: #4a6fa5;
+  font-family: var(--font-body); line-height: 1.6;
+}
+
+/* ── Print — render the canvas at actual A4 size ────────── */
+@media print {
+  .wrapper {
+    padding: 0 !important; gap: 0 !important;
+    background: white !important; display: block !important;
+    min-height: unset !important;
+  }
+  .toolbar, .hint { display: none !important; }
+
+  .padOuter {
+    width: 210mm !important;
+    max-width: unset !important;
+    height: 297mm !important;
+    position: relative !important;
+  }
+
+  /* Reset the JS transform — print at 1:1 */
+  .padSheet {
+    position: absolute !important;
+    top: 0 !important; left: 0 !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    transform: none !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  .editorWrap { overflow: visible !important; }
+
+  /* In print, editorWrap uses % of 297mm / 210mm */
+  /* These match the pixel values in .editorWrap above: 213/1123 ≈ 19%, etc. */
+  .editorWrap {
+    top: 19% !important;
+    bottom: calc(100% - 87.5%) !important;
+    left: 5% !important;
+    right: 4% !important;
+  }
+
+  .floatImgDelete, .floatImgResize, .floatImgLabel { display: none !important; }
+  .floatImg { outline: none !important; }
+
+  .padBg {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* ── Responsive toolbar ──────────────────────────────────── */
+@media (max-width: 920px) {
+  .wrapper { padding: 1rem 0.5rem 3rem; }
+  .toolbar { max-width: 100%; border-radius: 10px; }
+  .padOuter { max-width: 100%; }
+  .hint { max-width: 100%; }
+}
+@media (max-width: 600px) {
+  .select { max-width: 110px; font-size: 0.72rem; }
+  .selectSm { max-width: 44px; }
+  .toolBtn { width: 26px; height: 26px; }
+  .saveActionBtn, .printActionBtn { padding: 0 0.45rem; }
+  .actionLabel { font-size: 0.68rem; }
+}
