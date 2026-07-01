@@ -200,6 +200,9 @@ export default function CustomPadPage() {
   // scale = outerWidth / A4_W  so the fixed canvas fills available space
   const [scale, setScale] = useState(1);
 
+  const [pdfMsg, setPdfMsg] = useState("");
+  const [imgMsg, setImgMsg] = useState("");
+
   useEffect(() => {
     if (!outerRef.current) return;
     const ro = new ResizeObserver((entries) => {
@@ -248,7 +251,7 @@ export default function CustomPadPage() {
   const handleSavePDF = useCallback(async () => {
     if (!printRef.current) return;
     setSelectedImgId(null);
-    setSavedMsg("⏳ তৈরি হচ্ছে...");
+    setPdfMsg("⏳ তৈরি হচ্ছে...");
     await new Promise(r => setTimeout(r, 100));
     try {
       const html2pdf = (await import("html2pdf.js")).default;
@@ -259,12 +262,48 @@ export default function CustomPadPage() {
         html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: "#ffffff", width: A4_W, height: A4_H },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
       }).from(printRef.current).save();
-      setSavedMsg("✓ PDF সংরক্ষিত!");
+      setPdfMsg("✓ PDF সংরক্ষিত!");
     } catch (err) {
       console.error(err);
-      setSavedMsg("❌ ব্যর্থ হয়েছে");
+      setPdfMsg("❌ ব্যর্থ হয়েছে");
     }
-    setTimeout(() => setSavedMsg(""), 3000);
+    setTimeout(() => setPdfMsg(""), 3000);
+  }, []);
+
+  // ── Image (PNG/JPG) ─────────────────────────────────────────────
+  const handleSaveImage = useCallback(async (format = "png") => {
+    if (!printRef.current) return;
+    setSelectedImgId(null);
+    setImgMsg("⏳ তৈরি হচ্ছে...");
+    await new Promise(r => setTimeout(r, 100));
+    try {
+      const html2canvas = (await import("html2canvas")).default;
+      const canvas = await html2canvas(printRef.current, {
+        scale: 3,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+        width: A4_W,
+        height: A4_H,
+      });
+
+      const mime = format === "jpg" ? "image/jpeg" : "image/png";
+      const quality = format === "jpg" ? 0.95 : 1;
+      const dataUrl = canvas.toDataURL(mime, quality);
+
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = `swapnajatra-21-pad.${format}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setImgMsg("✓ ছবি সংরক্ষিত!");
+    } catch (err) {
+      console.error(err);
+      setImgMsg("❌ ব্যর্থ হয়েছে");
+    }
+    setTimeout(() => setImgMsg(""), 3000);
   }, []);
 
   // ── Floating image helpers ────────────────────────────────────────
@@ -379,8 +418,11 @@ export default function CustomPadPage() {
         <Btn title="সব মুছুন" onClick={() => {editor.chain().focus().clearContent().run();setFloatImgs([]);}}>
         {icons.clear}
         </Btn>
+        <button className={styles.saveActionBtn} onClick={() => handleSaveImage("png")} type="button">
+          <span className={styles.actionLabel}>{icons.image} {imgMsg || "PNG সংরক্ষণ"}</span>
+        </button>
         <button className={styles.saveActionBtn} onClick={handleSavePDF} type="button">
-          <span className={styles.actionLabel}>{icons.pdf} {savedMsg || "PDF সংরক্ষণ"}</span>
+          <span className={styles.actionLabel}>{icons.pdf} {pdfMsg || "PDF সংরক্ষণ"}</span>
         </button>
         <button className={styles.printActionBtn} onClick={handlePrint} type="button">
           <span className={styles.actionLabel}>{icons.print} প্রিন্ট</span>
