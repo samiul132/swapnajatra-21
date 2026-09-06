@@ -4,6 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 
+const FACEBOOK_URL = "https://www.facebook.com/profile.php?id=61575450163829";
+const WHATSAPP_NUMBER = "8801612043558"; // country code সহ, wa.me লিংকের জন্য
+
 const INFO_CARDS = [
   {
     icon: (
@@ -26,8 +29,8 @@ const INFO_CARDS = [
       </svg>
     ),
     iconBg: "rgba(67,170,139,0.15)", iconColor: "#43aa8b",
-    label: "ফোন",
-    value: "+880 1XXX-XXXXXX",
+    label: "ফোন / হোয়াটসঅ্যাপ",
+    value: "+880 1612-043558",
     sub: "সোম-শুক্র, সকাল ৯টা – বিকাল ৫টা",
   },
   {
@@ -61,17 +64,28 @@ export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.message) return;
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    setError("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("send failed");
       setSent(true);
-    }, 1400);
+    } catch (err) {
+      setError("বার্তা পাঠাতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -110,19 +124,29 @@ export default function ContactPage() {
                   {card.sub && <div className={styles.infoSub}>{card.sub}</div>}
                   {card.social && (
                     <div className={styles.socialRow}>
-                      <button className={styles.socialBtn}>
+                      <a
+                        href={FACEBOOK_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.socialBtn}
+                      >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
                         </svg>
                         Facebook
-                      </button>
-                      <button className={styles.socialBtn}>
+                      </a>
+                      <a
+                        href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.socialBtn}
+                      >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                           stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
                         </svg>
                         WhatsApp
-                      </button>
+                      </a>
                     </div>
                   )}
                 </div>
@@ -181,6 +205,7 @@ export default function ContactPage() {
                       required
                     />
                   </div>
+                  {error && <p style={{ color: "#ff6584", fontSize: "0.82rem", marginBottom: "0.8rem" }}>{error}</p>}
                   <button
                     type="submit"
                     className={styles.submitBtn}

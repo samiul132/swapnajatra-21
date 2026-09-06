@@ -3,9 +3,9 @@ import { useState } from "react";
 import Link from "next/link";
 const NAV_LINKS = [
   { href: "/",             label: "হোম" },
+  { href: "/activities",   label: "কার্যক্রম" },
   { href: "/gothontontro", label: "গঠনতন্ত্র" },
   { href: "/members",      label: "সদস্যবৃন্দ" },
-  { href: "/custom-pad", label: "প্যাড ✍️" },
   { href: "/contact",      label: "যোগাযোগ" },
 ];
 export default function Header() {
@@ -42,42 +42,42 @@ export default function Header() {
           </nav>
 
           <div className="flex gap-3 flex-wrap">
-  <button className="download-btn" onClick={handleDownload}>
-    <svg
-      width="15"
-      height="15"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-      <polyline points="7 10 12 15 17 10" />
-      <line x1="12" y1="15" x2="12" y2="3" />
-    </svg>
-    গঠনতন্ত্র
-  </button>
+            <button className="download-btn" onClick={handleDownload}>
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              গঠনতন্ত্র
+            </button>
 
-  <button className="download-btn" onClick={handleDownloadPad}>
-    <svg
-      width="15"
-      height="15"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-      <polyline points="7 10 12 15 17 10" />
-      <line x1="12" y1="15" x2="12" y2="3" />
-    </svg>
-    প্যাড
-  </button>
-</div>
+            <button className="download-btn" onClick={handleDownloadPad}>
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              প্যাড
+            </button>
+          </div>
 
           <button
             className="hamburger"
