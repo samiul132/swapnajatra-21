@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { href: '/admin/custom-pad', label: 'Custom Pad', icon: '📝' },
   { href: '/admin/activities', label: 'Activities', icon: '🖼️' },
   { href: '/admin/members', label: 'Members', icon: '👥' },
+  { href: '/admin/documents', label: 'Documents', icon: '📄' },
 ];
 
 export default function AdminSidebar({ open, onNavigate }) {
