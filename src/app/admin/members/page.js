@@ -18,6 +18,7 @@ const ROLE_OPTIONS = [
   { key: 'finance_secretary', label: 'অর্থ সম্পাদক' },
   { key: 'expatriate_welfare_secretary', label: 'প্রবাসী কল্যাণ সম্পাদক' },
   { key: 'office_secretary', label: 'দপ্তর সম্পাদক' },
+  { key: 'joint_office_secretary', label: 'যুগ্ম সাধারণ সম্পাদক' },
   { key: 'member', label: 'সদস্যবৃন্দ' },
 ];
 

@@ -118,6 +118,7 @@
 .card[data-role="finance_secretary"]::before             { background: linear-gradient(90deg, #f4a261, #e76f51); }
 .card[data-role="expatriate_welfare_secretary"]::before  { background: linear-gradient(90deg, #219ebc, #023047); }
 .card[data-role="office_secretary"]::before              { background: linear-gradient(90deg, #757bc8, #5a4fcf); }
+.card[data-role="joint_office_secretary"]::before       { background: linear-gradient(90deg, #757bc8, #5a4fcf); }
 .card[data-role="member"]::before                        { background: linear-gradient(90deg, #457b9d, #3a86ff); }
 
 .avatar {

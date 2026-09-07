@@ -20,6 +20,7 @@ const ROLE_META = {
   finance_secretary:            { label: "অর্থ সম্পাদক",            bg: "#f4a26120", color: "#f4a261", gradFrom: "#f4a261", gradTo: "#e76f51" },
   expatriate_welfare_secretary: { label: "প্রবাসী কল্যাণ সম্পাদক",  bg: "#219ebc20", color: "#219ebc", gradFrom: "#219ebc", gradTo: "#023047" },
   office_secretary:             { label: "দপ্তর সম্পাদক",           bg: "#757bc820", color: "#757bc8", gradFrom: "#757bc8", gradTo: "#5a4fcf" },
+  joint_office_secretary:       { label: "যুগ্ম সাধারণ সম্পাদক",           bg: "#757bc820", color: "#757bc8", gradFrom: "#757bc8", gradTo: "#5a4fcf" },
   member:                       { label: "সদস্যবৃন্দ",              bg: "#3a86ff20", color: "#3a86ff", gradFrom: "#457b9d", gradTo: "#3a86ff" },
 };
 
@@ -28,7 +29,7 @@ const EXEC_KEYS = [
   "education_secretary", "organizing_secretary", "health_secretary",
   "religious_secretary", "social_welfare_secretary", "women_affairs_secretary",
   "publicity_secretary", "finance_secretary", "expatriate_welfare_secretary",
-  "office_secretary",
+  "office_secretary", "joint_office_secretary",
 ];
 const ADVISOR_KEYS = ["advisor", "student_advisor"];
 
