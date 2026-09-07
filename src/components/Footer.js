@@ -1,7 +1,10 @@
 import Link from "next/link";
 
 export default function Footer() {
-  const year = new Date().getFullYear();
+  const foundingYear = 2026;
+  const currentYear = new Date().getFullYear();
+  const yearDisplay =
+    currentYear > foundingYear ? `${foundingYear}–${currentYear}` : `${foundingYear}`;
 
   return (
     <footer className="footer">
@@ -49,7 +52,7 @@ export default function Footer() {
                 <line x1="8" y1="2" x2="8" y2="6"/>
                 <line x1="3" y1="10" x2="21" y2="10"/>
               </svg>
-              <span>প্রতিষ্ঠা: ২০২৬</span>
+              <span>প্রতিষ্ঠা: ৩ এপ্রিল ২০২৬</span>
             </div>
 
             <div className="footer-info-item">
@@ -66,15 +69,27 @@ export default function Footer() {
 
         </div>
 
-        {/* Bottom */}
+                {/* Bottom */}
         <div className="footer-bottom">
           <p className="footer-copy">
-            © {year} <strong>স্বপ্নযাত্রা SSC 2021</strong> · সর্বস্বত্ব সংরক্ষিত
+            © {yearDisplay} <strong>স্বপ্নযাত্রা-21</strong> · সর্বস্বত্ব সংরক্ষিত
           </p>
           <div className="footer-badge">
             <span className="footer-dot" />
             সক্রিয় সংগঠন
           </div>
+        </div>
+
+        {/* Developer credit */}
+        <div className="footer-dev-credit">
+          Design &amp; Developed by{" "}
+          <Link
+            href="https://mdsamiularfin-portfolio.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            MD Samiul Hasan
+          </Link>
         </div>
       </div>
     </footer>

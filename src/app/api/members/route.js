@@ -17,9 +17,9 @@ export async function POST(req) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
   try {
-    const { name, role, sub, initial, image } = await req.json();
-    if (!name || !role) {
-      return Response.json({ error: 'name আর role দুইটাই লাগবে' }, { status: 400 });
+    const { name, roles, sub, initial, image } = await req.json();
+    if (!name || !Array.isArray(roles) || !roles.length) {
+      return Response.json({ error: 'name আর অন্তত একটা role লাগবে' }, { status: 400 });
     }
 
     const fileId = await findMembersFileId();
@@ -28,7 +28,7 @@ export async function POST(req) {
     const newMember = {
       id: Date.now().toString(),
       name,
-      role,
+      roles,
       sub: sub || '',
       initial: (initial || name.trim().charAt(0)).slice(0, 2),
       image: image || '',

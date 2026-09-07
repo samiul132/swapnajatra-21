@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 const NAV_LINKS = [
   { href: "/",             label: "হোম" },
   { href: "/activities",   label: "কার্যক্রম" },
@@ -18,20 +19,22 @@ export default function Header() {
     a.click();
   };
 
-  const handleDownloadPad = () => {
-    const a = document.createElement("a");
-    a.href = "/images/pad.png";
-    a.download = "swapnajatra-21-pad.png";
-    a.click();
-  };
-
   return (
     <>
       <header className="header">
         <div className="container header-inner">
           <Link href="/" className="logo">
-            <span className="logo-main">স্বপ্নযাত্রা-২১</span>
-            <span className="logo-sub">SSC 2021 · নিশ্চিন্তপুর</span>
+            <Image
+              src="/images/logo.png"
+              alt="স্বপ্নযাত্রা-২১ লোগো"
+              width={40}
+              height={40}
+              className="logo-img"
+            />
+            <div className="logo-text">
+              <span className="logo-main">স্বপ্নযাত্রা-২১</span>
+              <span className="logo-sub">SSC 2021 · নিশ্চিন্তপুর</span>
+            </div>
           </Link>
           <nav className="nav-links" aria-label="Main navigation">
             {NAV_LINKS.map((l) => (
@@ -59,24 +62,6 @@ export default function Header() {
               </svg>
               গঠনতন্ত্র
             </button>
-
-            <button className="download-btn" onClick={handleDownloadPad}>
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              প্যাড
-            </button>
           </div>
 
           <button
@@ -97,15 +82,6 @@ export default function Header() {
             {l.label}
           </Link>
         ))}
-        <button className="mobile-dl" onClick={handleDownloadPad}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-          প্যাড ডাউনলোড
-        </button>
         <button className="mobile-dl" onClick={handleDownload}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

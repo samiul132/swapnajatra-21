@@ -3,15 +3,27 @@
 import { useEffect, useState } from 'react';
 
 const ROLE_OPTIONS = [
-  { key: 'advisor', label: 'উপদেষ্টা' },
   { key: 'president', label: 'সভাপতি' },
   { key: 'vice', label: 'সহ-সভাপতি' },
-  { key: 'secretary', label: 'সাধারণ সম্পাদক' },
-  { key: 'treasurer', label: 'কোষাধ্যক্ষ' },
-  { key: 'member', label: 'সদস্য' },
+  { key: 'secretary', label: 'সেক্রেটারি' },
+  { key: 'advisor', label: 'উপদেষ্টা' },
+  { key: 'student_advisor', label: 'ছাত্র-উপদেষ্টা' },
+  { key: 'education_secretary', label: 'শিক্ষা বিষয়ক সম্পাদক' },
+  { key: 'organizing_secretary', label: 'সাংগঠনিক সম্পাদক' },
+  { key: 'health_secretary', label: 'স্বাস্থ্য বিষয়ক সম্পাদক' },
+  { key: 'religious_secretary', label: 'ধর্ম বিষয়ক সম্পাদক' },
+  { key: 'social_welfare_secretary', label: 'সমাজকল্যাণ সম্পাদক' },
+  { key: 'women_affairs_secretary', label: 'নারী বিষয়ক সম্পাদক' },
+  { key: 'publicity_secretary', label: 'প্রচার সম্পাদক' },
+  { key: 'finance_secretary', label: 'অর্থ সম্পাদক' },
+  { key: 'expatriate_welfare_secretary', label: 'প্রবাসী কল্যাণ সম্পাদক' },
+  { key: 'office_secretary', label: 'দপ্তর সম্পাদক' },
+  { key: 'member', label: 'সদস্যবৃন্দ' },
 ];
 
-const emptyForm = { id: null, name: '', role: 'member', sub: '', initial: '', image: '' };
+const ROLE_LABEL_MAP = Object.fromEntries(ROLE_OPTIONS.map((r) => [r.key, r.label]));
+
+const emptyForm = { id: null, name: '', roles: ['member'], sub: '', initial: '', image: '' };
 
 function resizeImage(file, maxWidth = 400, quality = 0.8) {
   return new Promise((resolve, reject) => {
@@ -33,6 +45,13 @@ function resizeImage(file, maxWidth = 400, quality = 0.8) {
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
+
+// পুরনো record এ `role` (string) থাকলে সেটাকে array বানিয়ে দেয়, নতুন `roles` (array) থাকলে সেটাই ফেরত দেয়
+function normalizeRoles(m) {
+  if (Array.isArray(m.roles) && m.roles.length) return m.roles;
+  if (m.role) return [m.role];
+  return ['member'];
 }
 
 export default function AdminMembersPage() {
@@ -63,8 +82,23 @@ export default function AdminMembersPage() {
   }
 
   function startEdit(m) {
-    setForm({ id: m.id, name: m.name, role: m.role, sub: m.sub, initial: m.initial, image: m.image || '' });
+    setForm({
+      id: m.id,
+      name: m.name,
+      roles: normalizeRoles(m),
+      sub: m.sub,
+      initial: m.initial,
+      image: m.image || '',
+    });
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleRole(key) {
+    setForm((f) => {
+      const has = f.roles.includes(key);
+      const next = has ? f.roles.filter((r) => r !== key) : [...f.roles, key];
+      return { ...f, roles: next };
+    });
   }
 
   async function handleImageChange(e) {
@@ -85,9 +119,13 @@ export default function AdminMembersPage() {
       setFormError('Name লাগবে');
       return;
     }
+    if (!form.roles.length) {
+      setFormError('অন্তত একটা পদ select করো');
+      return;
+    }
     setSaving(true);
     try {
-      const payload = { name: form.name, role: form.role, sub: form.sub, initial: form.initial, image: form.image };
+      const payload = { name: form.name, roles: form.roles, sub: form.sub, initial: form.initial, image: form.image };
       const res = form.id
         ? await fetch(`/api/members/${form.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
         : await fetch('/api/members', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -125,15 +163,29 @@ export default function AdminMembersPage() {
             onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
             className="admin-input"
           />
-          <select
-            value={form.role}
-            onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
-            className="admin-input"
+
+          <label style={{ display: 'block', marginBottom: 6, fontSize: 13.5, color: 'var(--admin-text-muted)' }}>
+            পদ (একাধিক select করা যাবে)
+          </label>
+          <div
+            style={{
+              display: 'flex', flexWrap: 'wrap', gap: '6px 14px',
+              padding: '10px 12px', marginBottom: '1rem',
+              border: '1px solid var(--admin-border)', borderRadius: 8,
+            }}
           >
             {ROLE_OPTIONS.map((r) => (
-              <option key={r.key} value={r.key}>{r.label}</option>
+              <label key={r.key} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={form.roles.includes(r.key)}
+                  onChange={() => toggleRole(r.key)}
+                />
+                {r.label}
+              </label>
             ))}
-          </select>
+          </div>
+
           <input
             type="text"
             placeholder="Sub-title (যেমন: SSC 2021 · বিজ্ঞান বিভাগ)"
@@ -182,41 +234,44 @@ export default function AdminMembersPage() {
         <p style={{ color: 'var(--admin-text-muted)' }}>লোড হচ্ছে...</p>
       ) : (
         <div className="admin-entries-grid">
-          {members.map((m) => (
-            <div key={m.id} className="admin-entry-card">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-                {m.image ? (
-                  <img
-                    src={m.image}
-                    alt={m.name}
-                    style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover' }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: 50, height: 50, borderRadius: '50%',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: 'var(--admin-primary-soft)', color: 'var(--admin-primary)',
-                      fontWeight: 700, fontSize: 15,
-                    }}
-                  >
-                    {m.initial}
+          {members.map((m) => {
+            const roles = normalizeRoles(m);
+            return (
+              <div key={m.id} className="admin-entry-card">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+                  {m.image ? (
+                    <img
+                      src={m.image}
+                      alt={m.name}
+                      style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: 50, height: 50, borderRadius: '50%',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: 'var(--admin-primary-soft)', color: 'var(--admin-primary)',
+                        fontWeight: 700, fontSize: 15,
+                      }}
+                    >
+                      {m.initial}
+                    </div>
+                  )}
+                  <div>
+                    <h4 className="admin-entry-title" style={{ margin: 0 }}>{m.name}</h4>
+                    <p className="admin-entry-desc" style={{ margin: 0 }}>
+                      {roles.map((rk) => ROLE_LABEL_MAP[rk] || rk).join(' · ')}
+                    </p>
                   </div>
-                )}
+                </div>
+                <p className="admin-entry-desc">{m.sub}</p>
                 <div>
-                  <h4 className="admin-entry-title" style={{ margin: 0 }}>{m.name}</h4>
-                  <p className="admin-entry-desc" style={{ margin: 0 }}>
-                    {ROLE_OPTIONS.find((r) => r.key === m.role)?.label || m.role}
-                  </p>
+                  <button onClick={() => startEdit(m)} className="admin-btn-edit">Edit</button>
+                  <button onClick={() => handleDelete(m.id)} className="admin-btn-danger">Delete</button>
                 </div>
               </div>
-              <p className="admin-entry-desc">{m.sub}</p>
-              <div>
-                <button onClick={() => startEdit(m)} className="admin-btn-edit">Edit</button>
-                <button onClick={() => handleDelete(m.id)} className="admin-btn-danger">Delete</button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

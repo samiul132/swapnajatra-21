@@ -7,7 +7,7 @@ export async function PUT(req, { params }) {
   }
   try {
     const { id } = await params;
-    const { name, role, sub, initial, image } = await req.json();
+    const { name, roles, sub, initial, image } = await req.json();
 
     const fileId = await findMembersFileId();
     const existing = await readMembers(fileId);
@@ -20,7 +20,7 @@ export async function PUT(req, { params }) {
     existing[index] = {
       ...existing[index],
       name: name ?? existing[index].name,
-      role: role ?? existing[index].role,
+      roles: Array.isArray(roles) && roles.length ? roles : existing[index].roles,
       sub: sub ?? existing[index].sub,
       initial: initial ?? existing[index].initial,
       image: image !== undefined ? image : existing[index].image,
