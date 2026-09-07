@@ -37,6 +37,11 @@ const FILTERS = [
   ...Object.entries(ROLE_META).map(([key, meta]) => ({ key, label: meta.label })),
 ];
 
+const rolePriority = (roles, orderList) => {
+  const idx = orderList.findIndex((k) => roles.includes(k));
+  return idx === -1 ? orderList.length : idx;
+};
+
 // পুরনো single-role data এর জন্য fallback
 function normalizeRoles(m) {
   if (Array.isArray(m.roles) && m.roles.length) return m.roles;
@@ -59,9 +64,15 @@ export default function MembersPage() {
   const withRoles = members.map((m) => ({ ...m, _roles: normalizeRoles(m) }));
   const filtered = filter === "all" ? withRoles : withRoles.filter((m) => m._roles.includes(filter));
 
-  const advisors   = filtered.filter((m) => m._roles.some((r) => ADVISOR_KEYS.includes(r)));
-  const executives = filtered.filter((m) => m._roles.some((r) => EXEC_KEYS.includes(r)));
-  const general    = filtered.filter((m) => m._roles.includes("member"));
+  const advisors = filtered
+    .filter((m) => m._roles.some((r) => ADVISOR_KEYS.includes(r)))
+    .sort((a, b) => rolePriority(a._roles, ADVISOR_KEYS) - rolePriority(b._roles, ADVISOR_KEYS));
+
+  const executives = filtered
+    .filter((m) => m._roles.some((r) => EXEC_KEYS.includes(r)))
+    .sort((a, b) => rolePriority(a._roles, EXEC_KEYS) - rolePriority(b._roles, EXEC_KEYS));
+
+  const general = filtered.filter((m) => m._roles.includes("member"));
 
   const renderCard = (m) => {
     const roles = m._roles;

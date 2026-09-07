@@ -7,7 +7,7 @@ export async function PUT(req, { params }) {
   }
   try {
     const { id } = await params;
-    const { title, description, image, date } = await req.json();
+    const { title, description, image, images, video, date } = await req.json();
 
     const fileId = await findFileId();
     const existing = await readData(fileId);
@@ -17,11 +17,17 @@ export async function PUT(req, { params }) {
       return Response.json({ error: 'Activity পাওয়া যায়নি' }, { status: 404 });
     }
 
+    const imageList = Array.isArray(images) && images.length
+      ? images
+      : (image ? [image] : existing[index].images || (existing[index].image ? [existing[index].image] : []));
+
     existing[index] = {
       ...existing[index],
       title: title ?? existing[index].title,
       description: description ?? existing[index].description,
-      image: image ?? existing[index].image,
+      images: imageList,
+      image: imageList[0] ?? existing[index].image, // backward compatibility
+      video: video !== undefined ? video : existing[index].video,
       date: date ?? existing[index].date,
       updatedAt: new Date().toISOString(),
     };

@@ -103,12 +103,22 @@
 .card:hover::before { opacity: 1; }
 
 /* Role badge colors */
-.card[data-role="president"]::before { background: linear-gradient(90deg, #ffd700, #ff6584); }
-.card[data-role="vice"]::before      { background: linear-gradient(90deg, #6c63ff, #8b5cf6); }
-.card[data-role="secretary"]::before { background: linear-gradient(90deg, #43aa8b, #2d6a4f); }
-.card[data-role="treasurer"]::before { background: linear-gradient(90deg, #f4a261, #e76f51); }
-.card[data-role="member"]::before    { background: linear-gradient(90deg, #457b9d, #3a86ff); }
-.card[data-role="advisor"]::before   { background: linear-gradient(90deg, #e63946, #c77dff); }
+.card[data-role="president"]::before                    { background: linear-gradient(90deg, #ffd700, #ff6584); }
+.card[data-role="vice"]::before                          { background: linear-gradient(90deg, #6c63ff, #8b5cf6); }
+.card[data-role="secretary"]::before                     { background: linear-gradient(90deg, #43aa8b, #2d6a4f); }
+.card[data-role="advisor"]::before                       { background: linear-gradient(90deg, #e63946, #c77dff); }
+.card[data-role="student_advisor"]::before               { background: linear-gradient(90deg, #ff9f1c, #ffbf69); }
+.card[data-role="education_secretary"]::before           { background: linear-gradient(90deg, #2a9d8f, #264653); }
+.card[data-role="organizing_secretary"]::before          { background: linear-gradient(90deg, #9d4edd, #7b2cbf); }
+.card[data-role="health_secretary"]::before              { background: linear-gradient(90deg, #06d6a0, #1b9aaa); }
+.card[data-role="religious_secretary"]::before           { background: linear-gradient(90deg, #118ab2, #073b4c); }
+.card[data-role="social_welfare_secretary"]::before      { background: linear-gradient(90deg, #ef476f, #d90429); }
+.card[data-role="women_affairs_secretary"]::before       { background: linear-gradient(90deg, #ff6b9d, #c9184a); }
+.card[data-role="publicity_secretary"]::before           { background: linear-gradient(90deg, #ffb703, #fb8500); }
+.card[data-role="finance_secretary"]::before             { background: linear-gradient(90deg, #f4a261, #e76f51); }
+.card[data-role="expatriate_welfare_secretary"]::before  { background: linear-gradient(90deg, #219ebc, #023047); }
+.card[data-role="office_secretary"]::before              { background: linear-gradient(90deg, #757bc8, #5a4fcf); }
+.card[data-role="member"]::before                        { background: linear-gradient(90deg, #457b9d, #3a86ff); }
 
 .avatar {
   width: 72px; height: 72px;

@@ -17,9 +17,14 @@ export async function POST(req) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
   try {
-    const { title, description, image, date } = await req.json();
-    if (!title || !image) {
-      return Response.json({ error: 'title আর image দুইটাই লাগবে' }, { status: 400 });
+    const { title, description, image, images, video, date } = await req.json();
+
+    const imageList = Array.isArray(images) && images.length
+      ? images
+      : (image ? [image] : []);
+
+    if (!title || imageList.length === 0) {
+      return Response.json({ error: 'title আর কমপক্ষে একটি image লাগবে' }, { status: 400 });
     }
 
     const fileId = await findFileId();
@@ -30,7 +35,9 @@ export async function POST(req) {
       id: Date.now().toString(),
       title,
       description: description || '',
-      image,
+      images: imageList,
+      image: imageList[0], // backward compatibility
+      video: video || null,
       date: date || now,
       createdAt: now,
     };

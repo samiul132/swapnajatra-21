@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
+const MAX_VIDEO_BYTES = 15 * 1024 * 1024; // 15MB
+
 function resizeImage(file, maxWidth = 1200, quality = 0.7) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -24,16 +26,28 @@ function resizeImage(file, maxWidth = 1200, quality = 0.7) {
   });
 }
 
+function readVideoAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
 }
 
+const emptyForm = { id: null, title: '', description: '', images: [], video: '', date: todayStr() };
+
 export default function ActivitiesPage() {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ id: null, title: '', description: '', imagePreview: '', date: todayStr() });
+  const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
 
   useEffect(() => {
     loadActivities();
@@ -54,33 +68,79 @@ export default function ActivitiesPage() {
   }
 
   function resetForm() {
-    setForm({ id: null, title: '', description: '', imagePreview: '', date: todayStr() });
+    setForm(emptyForm);
     setFormError('');
   }
 
   function startEdit(entry) {
+    const images = Array.isArray(entry.images) && entry.images.length
+      ? entry.images
+      : (entry.image ? [entry.image] : []);
     setForm({
       id: entry.id,
       title: entry.title,
       description: entry.description,
-      imagePreview: entry.image,
+      images,
+      video: entry.video || '',
       date: (entry.date || entry.createdAt || '').slice(0, 10) || todayStr(),
     });
+    setFormError('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  async function handleImageChange(e) {
+  async function handleImagesChange(e) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    setUploadingImages(true);
+    setFormError('');
+    try {
+      const resized = await Promise.all(files.map((f) => resizeImage(f)));
+      setForm((f) => ({ ...f, images: [...f.images, ...resized] }));
+    } catch {
+      setFormError('ছবি প্রসেস করতে সমস্যা হয়েছে');
+    } finally {
+      setUploadingImages(false);
+      e.target.value = '';
+    }
+  }
+
+  function removeImage(index) {
+    setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== index) }));
+  }
+
+  async function handleVideoChange(e) {
     const file = e.target.files[0];
     if (!file) return;
-    const preview = await resizeImage(file);
-    setForm((f) => ({ ...f, imagePreview: preview }));
+    setFormError('');
+    if (!file.type.startsWith('video/')) {
+      setFormError('অনুগ্রহ করে একটি ভিডিও ফাইল নির্বাচন করুন');
+      e.target.value = '';
+      return;
+    }
+    if (file.size > MAX_VIDEO_BYTES) {
+      setFormError('ভিডিও সাইজ ১৫MB এর বেশি হতে পারবে না, ছোট ক্লিপ ব্যবহার করুন');
+      e.target.value = '';
+      return;
+    }
+    try {
+      const dataUrl = await readVideoAsDataURL(file);
+      setForm((f) => ({ ...f, video: dataUrl }));
+    } catch {
+      setFormError('ভিডিও লোড করতে সমস্যা হয়েছে');
+    } finally {
+      e.target.value = '';
+    }
+  }
+
+  function removeVideo() {
+    setForm((f) => ({ ...f, video: '' }));
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setFormError('');
-    if (!form.title.trim() || !form.imagePreview) {
-      setFormError('Title আর image দুইটাই লাগবে');
+    if (!form.title.trim() || form.images.length === 0) {
+      setFormError('Title আর কমপক্ষে একটি ছবি দুইটাই লাগবে');
       return;
     }
     setSaving(true);
@@ -88,7 +148,9 @@ export default function ActivitiesPage() {
       const payload = {
         title: form.title,
         description: form.description,
-        image: form.imagePreview,
+        images: form.images,
+        image: form.images[0], 
+        video: form.video || null,
         date: form.date ? new Date(form.date).toISOString() : undefined,
       };
       const res = form.id
@@ -141,10 +203,45 @@ export default function ActivitiesPage() {
             onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
             className="admin-input"
           />
-          <input type="file" accept="image/*" onChange={handleImageChange} className="admin-input" />
-          {form.imagePreview && <img src={form.imagePreview} alt="preview" className="admin-entry-img" />}
+
+          <label className="admin-field-label">ছবি (একাধিক নির্বাচন করা যাবে)</label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleImagesChange}
+            className="admin-input"
+          />
+          {uploadingImages && <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}>ছবি প্রসেস হচ্ছে...</p>}
+          {form.images.length > 0 && (
+            <div className="admin-thumb-row">
+              {form.images.map((img, i) => (
+                <div key={i} className="admin-thumb">
+                  <img src={img} alt={`preview-${i}`} className="admin-thumb-img" />
+                  <button type="button" onClick={() => removeImage(i)} className="admin-thumb-remove">×</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <label className="admin-field-label">ভিডিও (ঐচ্ছিক, সর্বোচ্চ ১৫MB)</label>
+          <input
+            type="file"
+            accept="video/*"
+            onChange={handleVideoChange}
+            className="admin-input"
+          />
+          {form.video && (
+            <div className="admin-video-preview-wrap">
+              <video src={form.video} controls className="admin-video-preview" />
+              <button type="button" onClick={removeVideo} className="admin-btn-danger" style={{ marginTop: 6 }}>
+                ভিডিও সরাও
+              </button>
+            </div>
+          )}
+
           {formError && <p className="admin-error-text">{formError}</p>}
-          <button type="submit" className="admin-btn-primary" disabled={saving}>
+          <button type="submit" className="admin-btn-primary" disabled={saving || uploadingImages}>
             {saving ? 'সেভ হচ্ছে...' : form.id ? 'Update করো' : 'Add করো'}
           </button>
           {form.id && (
@@ -159,17 +256,26 @@ export default function ActivitiesPage() {
         <p style={{ color: 'var(--admin-text-muted)' }}>লোড হচ্ছে...</p>
       ) : (
         <div className="admin-activities-grid">
-          {activities.map((activity) => (
-            <div key={activity.id} className="admin-entry-card">
-              <img src={activity.image} alt={activity.title} className="admin-entry-img" />
-              <h4 className="admin-entry-title">{activity.title}</h4>
-              <p className="admin-entry-desc">{activity.description}</p>
-              <div>
-                <button onClick={() => startEdit(activity)} className="admin-btn-edit">Edit</button>
-                <button onClick={() => handleDelete(activity.id)} className="admin-btn-danger">Delete</button>
+          {activities.map((activity) => {
+            const images = Array.isArray(activity.images) && activity.images.length
+              ? activity.images
+              : (activity.image ? [activity.image] : []);
+            return (
+              <div key={activity.id} className="admin-entry-card">
+                <img src={images[0]} alt={activity.title} className="admin-entry-img" />
+                {images.length > 1 && (
+                  <div className="admin-entry-badge">+{images.length - 1} ছবি</div>
+                )}
+                {activity.video && <div className="admin-entry-badge">🎬 ভিডিও আছে</div>}
+                <h4 className="admin-entry-title">{activity.title}</h4>
+                <p className="admin-entry-desc">{activity.description}</p>
+                <div>
+                  <button onClick={() => startEdit(activity)} className="admin-btn-edit">Edit</button>
+                  <button onClick={() => handleDelete(activity.id)} className="admin-btn-danger">Delete</button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
