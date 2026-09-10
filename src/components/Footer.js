@@ -26,7 +26,7 @@ export default function Footer() {
             <ul className="footer-link-list">
               <li><Link href="/">হোম</Link></li>
               <li><Link href="/gothontontro">গঠনতন্ত্র</Link></li>
-              <li><Link href="/members">সদস্যবৃন্দ</Link></li>
+              <li><Link href="/members">সদস্য</Link></li>
               <li><Link href="/contact">যোগাযোগ</Link></li>
             </ul>
           </div>

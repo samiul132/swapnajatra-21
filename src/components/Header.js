@@ -6,7 +6,7 @@ const NAV_LINKS = [
   { href: "/",             label: "হোম" },
   { href: "/activities",   label: "কার্যক্রম" },
   { href: "/gothontontro", label: "গঠনতন্ত্র" },
-  { href: "/members",      label: "সদস্যবৃন্দ" },
+  { href: "/members",      label: "সদস্য" },
   { href: "/contact",      label: "যোগাযোগ" },
 ];
 export default function Header() {

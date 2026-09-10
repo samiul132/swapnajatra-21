@@ -144,7 +144,7 @@ export default function Home() {
               গঠনতন্ত্র দেখুন
             </Link>
             <Link href="/members" className="btn-secondary">
-              সদস্যবৃন্দ →
+              সদস্যদের তালিকা →
             </Link>
           </div>
 

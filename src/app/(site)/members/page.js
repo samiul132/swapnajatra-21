@@ -21,8 +21,11 @@ const ROLE_META = {
   expatriate_welfare_secretary: { label: "প্রবাসী কল্যাণ সম্পাদক",  bg: "#219ebc20", color: "#219ebc", gradFrom: "#219ebc", gradTo: "#023047" },
   office_secretary:             { label: "দপ্তর সম্পাদক",           bg: "#757bc820", color: "#757bc8", gradFrom: "#757bc8", gradTo: "#5a4fcf" },
   joint_office_secretary:       { label: "যুগ্ম সাধারণ সম্পাদক",           bg: "#757bc820", color: "#757bc8", gradFrom: "#757bc8", gradTo: "#5a4fcf" },
-  member:                       { label: "সদস্যবৃন্দ",              bg: "#3a86ff20", color: "#3a86ff", gradFrom: "#457b9d", gradTo: "#3a86ff" },
+  member:                       { label: "সদস্য",              bg: "#3a86ff20", color: "#3a86ff", gradFrom: "#457b9d", gradTo: "#3a86ff" },
 };
+
+
+const ROLE_ORDER = Object.keys(ROLE_META);
 
 const EXEC_KEYS = [
   "president", "vice", "secretary",
@@ -43,11 +46,12 @@ const rolePriority = (roles, orderList) => {
   return idx === -1 ? orderList.length : idx;
 };
 
-// পুরনো single-role data এর জন্য fallback
+
 function normalizeRoles(m) {
-  if (Array.isArray(m.roles) && m.roles.length) return m.roles;
-  if (m.role) return [m.role];
-  return ["member"];
+  const roles = Array.isArray(m.roles) && m.roles.length ? m.roles : (m.role ? [m.role] : ["member"]);
+  return [...roles].sort(
+    (a, b) => ROLE_ORDER.indexOf(a) - ROLE_ORDER.indexOf(b)
+  );
 }
 
 export default function MembersPage() {
@@ -122,11 +126,11 @@ export default function MembersPage() {
           <div className={styles.breadcrumb}>
             <Link href="/">হোম</Link>
             <span>›</span>
-            <span>সদস্যবৃন্দ</span>
+            <span>সদস্য</span>
           </div>
-          <h1 className={styles.pageTitle}>সদস্যবৃন্দ</h1>
+          <h1 className={styles.pageTitle}>সদস্য</h1>
           <p className={styles.pageSub}>
-            স্বপ্নযাত্রা-২১ এর উপদেষ্টা পরিষদ, কার্যনির্বাহী পরিষদ ও সাধারণ সদস্যবৃন্দের তালিকা।
+            স্বপ্নযাত্রা-২১ এর উপদেষ্টা পরিষদ, কার্যনির্বাহী পরিষদ ও সাধারণ সদস্যদের তালিকা।
           </p>
         </div>
       </div>
@@ -180,7 +184,7 @@ export default function MembersPage() {
           )}
           {!loading && general.length > 0 && (
             <>
-              <div className={styles.sectionLabel}>সাধারণ সদস্যবৃন্দ</div>
+              <div className={styles.sectionLabel}>সাধারণ সদস্য</div>
               <div className={styles.grid}>{general.map(renderCard)}</div>
             </>
           )}
